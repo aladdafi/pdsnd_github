@@ -2,9 +2,10 @@ import time
 import pandas as pd
 import numpy as np
 
-CITY_DATA = { 'chicago': 'chicago.csv',
-              'new york city': 'new_york_city.csv',
-              'washington': 'washington.csv' }
+CITYCITY_DATA = {'chicago': 'chicago.csv',
+                 'new york city': 'new_york_city.csv',
+                 'washington': 'washington.csv'}
+
 
 def get_filters():
     """
@@ -18,12 +19,9 @@ def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
 
-
     # get user input for month (all, january, february, ... , june)
 
-
     # get user input for day of week (all, monday, tuesday, ... sunday)
-
 
     print('-'*40)
     return city, month, day
@@ -41,6 +39,23 @@ def load_data(city, month, day):
         df - Pandas DataFrame containing city data filtered by month and day
     """
 
+    df = pd.read_csv(CITY_DATA[city])
+
+    df['Start Time'] = pd.to_datetime(df['Start Time'])
+    df['month'] = df['Start Time'].dt.month
+    df['day_of_week'] = df['Start Time'].dt.weekday_name
+
+    if month != 'all':
+
+        months = ['january', 'february', 'march', 'april', 'may', 'june']
+        month = months.index(month) + 1
+
+        # to filter month data
+        df = df[df['month'] == month]
+
+    if day != 'all':
+
+        df = df[df['day_of_week'] == day.title()]
 
     return df
 
@@ -51,14 +66,15 @@ def time_stats(df):
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
 
-    # display the most common month
+    # TO DO: display the most common month
+    print(df['month'].mode()[0])
 
+    # TO DO: display the most common day of week
+    print(df['day_of_week'].mode()[0])
 
-    # display the most common day of week
-
-
-    # display the most common start hour
-
+    # TO DO: display the most common start hour
+    df['hour'] = df['Start Time'].dt.hour
+    print(df['hour'].mode()[0])
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -70,14 +86,14 @@ def station_stats(df):
     print('\nCalculating The Most Popular Stations and Trip...\n')
     start_time = time.time()
 
-    # display most commonly used start station
+    # TO DO: display most commonly used start station
+    print(df['Start Station'].mode()[0])
 
-
-    # display most commonly used end station
-
-
-    # display most frequent combination of start station and end station trip
-
+    # TO DO: display most commonly used end station
+    print(df['End Station'].mode()[0])
+    # TO DO: display most frequent combination of start station and end station trip
+    df['Combination'] = df['Start Station'] + " " + df['End Station']
+    print(df['Combination'].mode()[0])
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -89,11 +105,11 @@ def trip_duration_stats(df):
     print('\nCalculating Trip Duration...\n')
     start_time = time.time()
 
-    # display total travel time
+    # TO DO: display total travel time
+    print(df['Trip Duration'].sum())
 
-
-    # display mean travel time
-
+    # TO DO: display mean travel time
+    print(df['Trip Duration'].mean())
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -105,14 +121,29 @@ def user_stats(df):
     print('\nCalculating User Stats...\n')
     start_time = time.time()
 
-    # Display counts of user types
+    try:
 
+        earliest = df['Birth Year'].min()
+        print("the earliest:", earliest)
 
-    # Display counts of gender
+    except KeyError:
+        print("no info")
 
+    try:
 
-    # Display earliest, most recent, and most common year of birth
+        most_recent_year = df['Birth Year'].max()
+        print("the most recent year:", most_recent_year)
 
+    except KeyError:
+        print("no info")
+
+    try:
+
+        most_common_year = df['Birth Year'].value_counts().idxmax()
+        print("most commn year: ", most_common_year)
+
+    except KeyError:
+        print('no info')
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -134,4 +165,4 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+    main()
